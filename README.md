@@ -63,8 +63,3 @@ _Assumptions:_
 * Total 4 teachers per department who deliver 2 courses each.
 * Each department offers two courses per term, i.e. total 8 courses are offered by each department.
 
-
-
-
-
-
