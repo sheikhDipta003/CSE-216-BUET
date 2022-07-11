@@ -33,6 +33,9 @@ else {
             <?php
             echo 'Department: ' . $result[3] . '</br>';
             echo 'Advisor ID: ' . $result[2] . '</br>';
+            echo 'Level: ' . $result[6] . '</br>';
+            echo 'Term: ' . $result[7] . '</br>';
+            echo 'Present Address: '. $result[8] . ', '. $result[9] .'</br>';
             echo 'Registration Status: ' . $result[5].'</br>';
             if($result[4] != -1){
                 echo 'Registration ID: ' . $result[4].'</br>';

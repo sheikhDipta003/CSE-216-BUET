@@ -7,9 +7,9 @@ class crud{
     }
 
     public function getStudentDetails($id){
-        $query = 'SELECT sid, Student.name, aid, Department.name dept_name, reg_id, reg_status
-        FROM Student JOIN Department USING(did) JOIN Registration USING(sid,did)
-        WHERE sid=:ibv';
+        $query = 'SELECT S.sid, S.name, aid, D.name dept_name, reg_id, reg_status, S.curr_level, S.curr_term, SA.street_address, SA.district
+        FROM Student S JOIN Department D ON(S.did = D.did) JOIN Registration R ON(S.sid = R.sid AND S.did = R.did) JOIN SAddress SA ON(S.sid = SA.id AND S.did = SA.did)
+        WHERE S.sid=:ibv';
         $s = oci_parse($this->db, $query);
         oci_bind_by_name($s, ":ibv", $id);
         oci_execute($s);
