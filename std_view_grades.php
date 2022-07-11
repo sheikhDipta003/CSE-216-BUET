@@ -12,7 +12,7 @@ if(isset($_SESSION['sid']) && isset($_GET['level']) && isset($_GET['term'])){
         $tot_credit += $grades[$i][2];
         $tot_weighted_gp += $grades[$i][4];
     }
-    if($tot_credit != 0)    $gpa = $tot_weighted_gp / $tot_credit;
+    if($tot_credit != 0)    $gpa = round($tot_weighted_gp / $tot_credit, 2);
     else    echo '<h1 class="text-danger text-center">You are not qualified to view grades of this term</h1>';
 }
 ?>
