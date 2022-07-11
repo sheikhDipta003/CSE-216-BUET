@@ -70,9 +70,10 @@ class crud{
     }
 
     public function getAdvisee($tid){
-        $query = 'SELECT S.sid, S.name
-        FROM Teacher T JOIN Student S ON(T.tid = S.aid)
-        WHERE T.tid = :tchbv';
+        $query = "SELECT S.sid, S.name
+        FROM Student S JOIN Teacher T ON(T.tid = S.aid) JOIN Registration R ON(R.sid = S.sid)
+        WHERE T.tid = :tchbv
+        AND R.reg_status = 'pending'";
         $s = oci_parse($this->db, $query);
         oci_bind_by_name($s, ":tchbv", $tid);
         oci_execute($s);

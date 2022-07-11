@@ -24,27 +24,25 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['courses_selected'])){
     //     echo $courses_selected[$i]."<br />";
     // }
     $crud->updateRegReq($_SESSION['sid'], $courses_selected);
-    $_SESSION['req_sent'] = 'T';
+    //$_SESSION['req_sent'] = 'T';
 }
 ?>
 <form method="get" action="<?php echo htmlentities($_SERVER['PHP_SELF']);?>">
     <table class="table table-dark table-hover">
     <?php
-        if(!isset($_SESSION['req_sent'])) echo '<th>Select</th>';
+        if(trim($reg_status[0]) == 'pending') echo '<th>Select</th>';
     ?>
     <th>Course ID</th>
     <th>Course Name</th>
     <th>Credit Hour</th>
-    <?php
-        if(isset($_SESSION['req_sent'])) echo '<th>Registration Status</th>';
-    ?>
+    <th>Registration Status</th>
     <?php
             for($i = 0; $i < count($courses); $i++){
         ?>
 
         <tr>
             <?php
-                if(!isset($_SESSION['req_sent'])) {
+                if(trim($reg_status[0]) == 'pending') {
             ?>
                 <td> <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="<?php echo $courses[$i][0]; ?>" name="courses_selected[]">
@@ -54,18 +52,14 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['courses_selected'])){
             <td><?php echo $courses[$i][0]; ?></td>
             <td><?php echo $courses[$i][1]; ?></td>
             <td><?php echo $courses[$i][2]; ?></td>
-            <?php
-                if(isset($_SESSION['req_sent'])) {
-            ?>
             <td><?php echo $reg_status[0]; ?></td>
-            <?php } ?>
         </tr>
 
     <?php } ?>
     </table>
 
     <?php
-        if(!isset($_SESSION['req_sent'])) {
+        if(trim($reg_status[0]) == 'pending') {
     ?>
     <div class="d-flex flex-row mb-3 justify-content-evenly">
         <input class="btn btn-outline-dark" type="submit" value="Submit">
