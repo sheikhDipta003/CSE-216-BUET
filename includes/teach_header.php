@@ -9,7 +9,7 @@
           <a class="nav-link active" href="view_registrants.php">Registrants</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="#">Modify Grades</a>
+          <a class="nav-link active" href="modify_grades.php">Modify Grades</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" href="#">Change Password</a>

@@ -16,6 +16,44 @@ class crud{
         return oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS);
     }
 
+    public function getStudentsOf($tid, $cid){
+        $query = "SELECT T.sid, (SELECT D.name FROM Department D WHERE D.did = T.std_in_did) dept_name, T.year, T.term
+        FROM Takes T JOIN Course C ON(T.cid = C.cid AND T.tid = C.tid AND T.OFFEER_BY_DID = C.did) JOIN Registration R ON(T.sid = R.sid AND T.std_in_did = R.did)
+        WHERE T.tid = :tchbv
+        AND T.cid = :coursebv
+        AND R.reg_status = 'approved'";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":tchbv", $tid);
+        oci_bind_by_name($s, ":coursebv", $cid);
+        oci_execute($s);
+
+        $result = [];$i = 0;
+        while($row = oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS)){
+            $result[$i++] = $row;
+        }
+        return $result;
+    }
+
+    public function getGradesOf($sid, $level, $term){
+        $query = "SELECT T.cid, C.name, C.credit_hr, T.grade, (C.credit_hr * T.grade)
+        FROM Takes T JOIN Course C ON(T.cid = C.cid) JOIN Registration R ON(R.sid = T.sid)
+        WHERE T.sid = :stdbv
+        AND T.year = :levelbv
+        AND T.term = :termbv
+        AND R.reg_status = 'approved'";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":stdbv", $sid);
+        oci_bind_by_name($s, ":levelbv", $level);
+        oci_bind_by_name($s, ":termbv", $term);
+        oci_execute($s);
+
+        $result = [];$i = 0;
+        while($row = oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS)){
+            $result[$i++] = $row;
+        }
+        return $result;
+    }
+
     public function getCoursesForReg($id){
         $query = 'SELECT C.cid, C.name, C.credit_hr
         FROM Course C
@@ -26,6 +64,21 @@ class crud{
         )';
         $s = oci_parse($this->db, $query);
         oci_bind_by_name($s, ":stdbv", $id);
+        oci_execute($s);
+
+        $result = [];$i = 0;
+        while($row = oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS)){
+            $result[$i++] = $row;
+        }
+        return $result;
+    }
+
+    public function getCoursesDeliveredBy($tid){
+        $query = 'SELECT C.cid, C.name, C.credit_hr
+        FROM Course C
+        WHERE C.tid = :tchbv';
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":tchbv", $tid);
         oci_execute($s);
 
         $result = [];$i = 0;
@@ -127,6 +180,16 @@ class crud{
             oci_bind_by_name($s, ":cbv", $course);
             oci_execute($s);
         }
+    }
+
+    public function updateGradesOf($sid, $cid, $tid, $newGrade){
+        $query = "UPDATE Takes SET grade = :gdbv WHERE sid = :stdbv AND cid = :cbv AND tid = :tchbv";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":gdbv", $newGrade);
+        oci_bind_by_name($s, ":stdbv", $sid);
+        oci_bind_by_name($s, ":tchbv", $tid);
+        oci_bind_by_name($s, ":cbv", $cid);
+        oci_execute($s);
     }
 }
 
