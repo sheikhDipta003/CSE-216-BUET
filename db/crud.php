@@ -16,6 +16,16 @@ class crud{
         return oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS);
     }
 
+    public function getStdPersonalInfo($sid){
+        $query = 'SELECT S.name, S.password, SA.street_address, SA.district
+        FROM Student S JOIN SAddress SA ON(S.sid = SA.id AND S.did = SA.did)
+        WHERE S.sid = :sbv';
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":sbv", $sid);
+        oci_execute($s);
+        return oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS);
+    }
+
     public function getStudentsOf($tid, $cid){
         $query = "SELECT T.sid, (SELECT D.name FROM Department D WHERE D.did = T.std_in_did) dept_name, T.year, T.term
         FROM Takes T JOIN Course C ON(T.cid = C.cid AND T.tid = C.tid AND T.OFFEER_BY_DID = C.did) JOIN Registration R ON(T.sid = R.sid AND T.std_in_did = R.did)
@@ -52,6 +62,16 @@ class crud{
             $result[$i++] = $row;
         }
         return $result;
+    }
+
+    public function getTeachPersonalInfo($tid){
+        $query = 'SELECT T.name, T.contact_no, T.email, T.password, TA.street_address, TA.district
+        FROM Teacher T JOIN TAddress TA ON(T.tid = TA.id)
+        WHERE T.tid = :tbv';
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":tbv", $tid);
+        oci_execute($s);
+        return oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS);
     }
 
     public function getCoursesForReg($id){
@@ -189,6 +209,40 @@ class crud{
         oci_bind_by_name($s, ":stdbv", $sid);
         oci_bind_by_name($s, ":tchbv", $tid);
         oci_bind_by_name($s, ":cbv", $cid);
+        oci_execute($s);
+    }
+
+    public function updateStdInfo($sid, $name, $st_addr, $dstr, $pass){
+        $query = "UPDATE Student SET name = :nbv, password = :pbv WHERE sid = :stdbv";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":nbv", $name);
+        oci_bind_by_name($s, ":pbv", $pass);
+        oci_bind_by_name($s, ":stdbv", $sid);
+        oci_execute($s);
+
+        $query = "UPDATE SAddress SET street_address = :stbv, district = :dstbv WHERE id = :stdbv";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":stbv", $st_addr);
+        oci_bind_by_name($s, ":dstbv", $dstr);
+        oci_bind_by_name($s, ":stdbv", $sid);
+        oci_execute($s);
+    }
+
+    public function updateTeachInfo($tid, $name, $phone, $email, $st_addr, $dstr, $pass){
+        $query = "UPDATE Teacher SET name = :nbv, contact_no = :cnbv, email = :ebv, password = :pbv WHERE tid = :tbv";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":nbv", $name);
+        oci_bind_by_name($s, ":cnbv", $phone);
+        oci_bind_by_name($s, ":ebv", $email);
+        oci_bind_by_name($s, ":pbv", $pass);
+        oci_bind_by_name($s, ":tbv", $tid);
+        oci_execute($s);
+
+        $query = "UPDATE TAddress SET street_address = :stbv, district = :dstbv WHERE id = :tbv";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":stbv", $st_addr);
+        oci_bind_by_name($s, ":dstbv", $dstr);
+        oci_bind_by_name($s, ":tbv", $tid);
         oci_execute($s);
     }
 }

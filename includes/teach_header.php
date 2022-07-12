@@ -12,7 +12,7 @@
           <a class="nav-link active" href="modify_grades.php">Modify Grades</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="#">Change Password</a>
+          <a class="nav-link active" href="teach_edit_info.php">Edit Personal Info</a>
         </li>
         <li class="nav-item">
             <?php 

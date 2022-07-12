@@ -24,7 +24,7 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="#">Change Password</a>
+          <a class="nav-link active" href="std_edit_info.php">Edit Personal Info</a>
         </li>
         <li class="nav-item">
             <?php 
