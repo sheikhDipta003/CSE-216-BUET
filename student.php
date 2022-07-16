@@ -13,7 +13,7 @@ class student{
         oci_bind_by_name($s, ":ibv", $id);
         oci_bind_by_name($s, ":pbv", $pass);
         oci_execute($s);
-        return oci_fetch_array($s, OCI_ASSOC+OCI_RETURN_NULLS);
+        return oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS);
     }
 }
 

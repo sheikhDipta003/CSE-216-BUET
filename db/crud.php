@@ -46,11 +46,11 @@ class crud{
 
     public function getGradesOf($sid, $level, $term){
         $query = "SELECT T.cid, C.name, C.credit_hr, T.grade, (C.credit_hr * T.grade)
-        FROM Takes T JOIN Course C ON(T.cid = C.cid) JOIN Registration R ON(R.sid = T.sid)
+        FROM Takes T JOIN Course C ON(T.cid = C.cid)
         WHERE T.sid = :stdbv
         AND T.year = :levelbv
         AND T.term = :termbv
-        AND R.reg_status = 'approved'";
+        AND T.grade IS NOT NULL";         //assuming that grade is null if registration is not approved
         $s = oci_parse($this->db, $query);
         oci_bind_by_name($s, ":stdbv", $sid);
         oci_bind_by_name($s, ":levelbv", $level);
@@ -74,16 +74,20 @@ class crud{
         return oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS);
     }
 
-    public function getCoursesForReg($id){
+    public function getCoursesForReg($id, $level, $term){
         $query = 'SELECT C.cid, C.name, C.credit_hr
         FROM Course C
         WHERE C.cid IN (
         SELECT T.cid
         FROM Student S JOIN Takes T ON(S.sid = T.sid AND S.did = T.std_in_did)
         WHERE T.sid = :stdbv
+        AND T.year = :lbv
+        AND T.term = :tbv
         )';
         $s = oci_parse($this->db, $query);
         oci_bind_by_name($s, ":stdbv", $id);
+        oci_bind_by_name($s, ":lbv", $level);
+        oci_bind_by_name($s, ":tbv", $term);
         oci_execute($s);
 
         $result = [];$i = 0;
@@ -108,13 +112,32 @@ class crud{
         return $result;
     }
 
-    public function getRegisteredCourses($id){
+    public function getCoursesOfferedBy($did){
+        $query = 'SELECT *
+        FROM Course
+        WHERE did = :dbv';
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":dbv", $did);
+        oci_execute($s);
+
+        $result = [];$i = 0;
+        while($row = oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS)){
+            $result[$i++] = $row;
+        }
+        return $result;
+    }
+
+    public function getRegisteredCourses($id, $level, $term){
         $query = "SELECT C.cid, C.name
         FROM Takes T JOIN Course C ON(T.cid = C.cid) JOIN Student S ON(T.sid = S.sid)
         WHERE S.sid = :stdbv
-        AND T.reg_req = 'sent'";
+        AND T.reg_req = 'sent'
+        AND T.year = :lbv
+        AND T.term = :tbv";
         $s = oci_parse($this->db, $query);
         oci_bind_by_name($s, ":stdbv", $id);
+        oci_bind_by_name($s, ":lbv", $level);
+        oci_bind_by_name($s, ":tbv", $term);
         oci_execute($s);
 
         $result = [];$i = 0;
@@ -244,6 +267,54 @@ class crud{
         oci_bind_by_name($s, ":dstbv", $dstr);
         oci_bind_by_name($s, ":tbv", $tid);
         oci_execute($s);
+    }
+
+    public function updateStudentInfo($sid, $did, $lev, $term){
+        $query = "UPDATE Student SET curr_level = :lbv, curr_term = :tbv WHERE sid = :stdbv AND did = :deptbv";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":stdbv", $sid);
+        oci_bind_by_name($s, ":deptbv", $did);
+        oci_bind_by_name($s, ":lbv", $lev);
+        oci_bind_by_name($s, ":tbv", $term);
+        oci_execute($s);
+
+        $query = "UPDATE Registration SET reg_id = -1, reg_status = 'pending' WHERE sid = :stdbv AND did = :deptbv";
+        $s = oci_parse($this->db, $query);
+        oci_bind_by_name($s, ":stdbv", $sid);
+        oci_bind_by_name($s, ":deptbv", $did);
+        oci_execute($s);
+    }
+
+    public function insertIntoTakes($students, $did, $courses, $levels, $terms){
+        for($j = 0; $j < count($courses); $j++){
+            $u = $courses[$j];
+
+            for($i = 0; $i < count($students); $i++){
+                $v = $students[$i];
+                $y = $levels[$i];
+                $z = $terms[$i];
+
+                $query = 'SELECT tid, did FROM Course WHERE cid = :cidbv';
+                $s = oci_parse($this->db, $query);
+                oci_bind_by_name($s, ":cidbv", $u);
+                oci_execute($s);
+                $course_details = oci_fetch_array($s, OCI_NUM+OCI_RETURN_NULLS);
+
+                $w = $course_details[0];
+                $x = $course_details[1];
+
+                $query = "INSERT INTO Takes VALUES (:stdbv, :deptbv, :cbv, :tidbv, :cdeptbv, :lbv, :tbv, null, 'not_sent')";
+                $s = oci_parse($this->db, $query);
+                oci_bind_by_name($s, ":stdbv", $v);
+                oci_bind_by_name($s, ":deptbv", $did);
+                oci_bind_by_name($s, ":cbv", $u);
+                oci_bind_by_name($s, ":tidbv", $w);
+                oci_bind_by_name($s, ":cdeptbv", $x);
+                oci_bind_by_name($s, ":lbv", $y);
+                oci_bind_by_name($s, ":tbv", $z);
+                oci_execute($s);
+            }
+        }
     }
 }
 

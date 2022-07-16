@@ -41,13 +41,14 @@ for($i = 0; $i < count($advisees); $i++){
                 </button>
                 <div class="collapse" id=<?php echo 'collapseExample-'.$advisees[$i][0]; ?>>
                     <?php 
-                        $result = $crud->getRegisteredCourses($advisees[$i][0]);
+                        if(isset($_SESSION['level']) && isset($_SESSION['term'])){
+                        $result = $crud->getRegisteredCourses($advisees[$i][0], $_SESSION['level'], $_SESSION['term']);
                         for($j = 0; $j < count($result); $j++){
                     ?>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item"><?php echo $result[$j][0].'-'.$result[$j][1]; ?></li>
                         </ul>
-                    <?php } ?>
+                    <?php }} ?>
                 </div>
             </form>
         </td>

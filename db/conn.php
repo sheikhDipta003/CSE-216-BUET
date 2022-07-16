@@ -7,7 +7,9 @@ if (!$c) {
 require_once 'crud.php';
 require_once 'student.php';
 require_once 'teacher.php';
+require_once 'admin.php';
 $crud = new crud($c);
 $std = new student($c);
 $teach = new teacher($c);
+$admin = new admin($c);
 ?>

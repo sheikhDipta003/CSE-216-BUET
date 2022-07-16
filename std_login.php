@@ -3,26 +3,51 @@ $title = 'Login';
 require_once 'includes/header.php';
 require_once 'db/conn.php';
 
+function showError(){
+  echo '<div class="d-flex flex-row justify-content-evenly">
+  <div class="toast show align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" >
+          <div class="d-flex">
+              <div class="toast-body">
+              Wrong id or password
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+      </div>
+  </div>';
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $inputid = trim($_POST['id']);
+    $inputid = ucfirst(trim($_POST['id']));
     $inputpass = $_POST['pass'];
+
+    if(str_starts_with($inputid, 'A')){
+      $result3 = $admin->getAdmin($inputid, $inputpass);
+      if(!$result3){
+        showError();
+      }
+      else{
+        $_SESSION['ad_id'] = $_POST['id'];
+        $_SESSION['dept_id'] = $result3[1];
+        $url = 'http://localhost/term_project_sql/admin_view.php';
+        if (!headers_sent()) { // check headers - you can not send headers if they already sent
+            header('Location: ' . $url);
+            exit; // protects from code being executed after redirect request
+        } else {
+            throw new Exception('Cannot redirect, headers already sent');
+        }
+      }
+    }
+
     $result1 = $std->getStudent($inputid, $inputpass);
     $result2 = $teach->getTeacher($inputid, $inputpass);
 
     if(!$result1 && !$result2){
-        echo '<div class="d-flex flex-row justify-content-evenly">
-        <div class="toast show align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" >
-                <div class="d-flex">
-                    <div class="toast-body">
-                    Wrong student id or password
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>';
+       showError();
     }
     else if($result1){
         $_SESSION['sid'] = $_POST['id'];
+        $_SESSION['level'] = $result1[5];
+        $_SESSION['term'] = $result1[6];
         $url = 'http://localhost/term_project_sql/std_view.php?id='.$_POST['id'];
         if (!headers_sent()) { // check headers - you can not send headers if they already sent
             header('Location: ' . $url);

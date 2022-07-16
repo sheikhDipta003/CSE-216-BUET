@@ -6,12 +6,12 @@ require_once 'db/conn.php';
 
 if(isset($_GET['id'])){
     $sid = $_GET['id'];
-    $courses = $crud->getCoursesForReg($sid);
+    $courses = $crud->getCoursesForReg($sid, $_SESSION['level'], $_SESSION['term']);
     $reg_status = $crud->getRegStatus($sid);
 }
-else if(isset($_SESSION['sid'])){
+else if(isset($_SESSION['sid']) && isset($_SESSION['level']) && isset($_SESSION['term'])){
     $sid = $_SESSION['sid'];
-    $courses = $crud->getCoursesForReg($sid);
+    $courses = $crud->getCoursesForReg($sid, $_SESSION['level'], $_SESSION['term']);
     $reg_status = $crud->getRegStatus($sid);
 }
 else {
