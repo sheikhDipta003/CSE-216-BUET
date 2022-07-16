@@ -40,16 +40,17 @@ if(isset($_GET['submit']) && isset($_GET['courses_selected']) && isset($_GET['se
 <div class="accordion" id="accordionExample">
     <?php
         for($i = 1; $i <= 4; $i++){
-            $students1 = getStd($admin, $i, 1);
+            for($p = 1; $p <= 2; $p++){
+            $students = getStd($admin, $i, $p);
     ?>
 
   <div class="accordion-item">
-    <h2 class="accordion-header" id=<?php echo "heading".$i.'1';?>>
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target=<?php echo "#collapse".$i.'1';?> aria-expanded="true" aria-controls=<?php echo "collapse".$i.'1';?>>
-        Level - <?php echo $i;?>   Term - 1
+    <h2 class="accordion-header" id=<?php echo "heading".$i.$p;?>>
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target=<?php echo "#collapse".$i.$p;?> aria-expanded="false" aria-controls=<?php echo "collapse".$i.$p;?>>
+        Level - <?php echo $i;?>   Term - <?php echo $p;?>
       </button>
     </h2>
-    <div id=<?php echo "collapse".$i.'1';?> class="accordion-collapse collapse show" aria-labelledby=<?php echo "heading".$i.'1';?> data-bs-parent="#accordionExample">
+    <div id=<?php echo "collapse".$i.$p;?> class="accordion-collapse collapse" aria-labelledby=<?php echo "heading".$i.$p;?> data-bs-parent="#accordionExample">
       <div class="accordion-body">
             <form method="get" action="<?php echo htmlentities($_SERVER['PHP_SELF']);?>">
                 <table class="table table-dark table-hover">
@@ -60,12 +61,12 @@ if(isset($_GET['submit']) && isset($_GET['courses_selected']) && isset($_GET['se
                     <th>Registration Status</th>
                     <?php
                         
-                        for($j = 0; $j < count($students1); $j++){
-                            if(calculate_gpa($crud, $students1[$j][0], $i, 1) != null && calculate_gpa($crud, $students1[$j][0], $i, 1) > 0.0){
+                        for($j = 0; $j < count($students); $j++){
+                            if(calculate_gpa($crud, $students[$j][0], $i, $p) != null && calculate_gpa($crud, $students[$j][0], $i, $p) > 0.0){
                     ?>
-                    <input type="hidden" name="students[]" value="<?php echo $students1[$j][0];?>" />
+                    <input type="hidden" name="students[]" value="<?php echo $students[$j][0];?>" />
                         <tr>
-                            <td><?php echo $students1[$j][0];?></td>
+                            <td><?php echo $students[$j][0];?></td>
                             <td>
                                 <select class="form-select" name="selectLevel[]">
                                 <option value="1">1</option>
@@ -82,12 +83,12 @@ if(isset($_GET['submit']) && isset($_GET['courses_selected']) && isset($_GET['se
                             </td>
                             <td>
                                 <?php
-                                    echo calculate_gpa($crud, $students1[$j][0], $i, 1);
+                                    echo calculate_gpa($crud, $students[$j][0], $i, $p);
                                 ?>
                             </td>
                             <td>
                                 <?php
-                                    echo ($crud->getRegStatus($students1[$j][0]))[0];
+                                    echo ($crud->getRegStatus($students[$j][0]))[0];
                                 ?>
                             </td>
                         </tr>
@@ -120,7 +121,7 @@ if(isset($_GET['submit']) && isset($_GET['courses_selected']) && isset($_GET['se
     </div>
   </div>
 
-    <?php } ?>
+    <?php }} ?>
 </div>
 
 
